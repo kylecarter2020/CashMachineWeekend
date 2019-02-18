@@ -47,6 +47,15 @@ public class CashMachine {
         }
     }
 
+    public  void addAccount(int accountNumber, String name, String email, int initialDeposit){
+        if (accountData != null) {
+            tryCall(
+                    () -> bank.addAccount(accountNumber, name, email, initialDeposit),
+                    update
+            );
+        }
+    }
+
     public void exit() {
         if (accountData != null) {
             accountData = null;

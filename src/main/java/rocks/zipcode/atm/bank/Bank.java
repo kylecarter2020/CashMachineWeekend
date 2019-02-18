@@ -2,6 +2,7 @@ package rocks.zipcode.atm.bank;
 
 import rocks.zipcode.atm.ActionResult;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,11 @@ public class Bank {
         accounts.put(2000, new PremiumAccount(new AccountData(
                 2000, "Example 2", "example2@gmail.com", 200
         )));
+    }
+
+    public ActionResult<AccountData> addAccount(int accountNumber, String name, String email, int initialDeposit){
+        Account account = accounts.put(2000, new PremiumAccount(new AccountData(accountNumber, name, email, initialDeposit)));
+        return ActionResult.success(account.getAccountData());
     }
 
     public ActionResult<AccountData> getAccountById(int id) {
@@ -49,4 +55,5 @@ public class Bank {
             return ActionResult.fail("Withdraw failed: " + amount + ". Account has: " + account.getBalance());
         }
     }
+
 }
