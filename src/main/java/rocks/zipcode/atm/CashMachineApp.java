@@ -142,16 +142,21 @@ public class CashMachineApp extends Application {
 
             Optional<Void> result = dialog.showAndWait();
 
-            result. (accountInfo -> {
+
+            if(result.isPresent()){
+                String n = name.getText();
+                String mail = email.getText();
+                int am = Integer.parseInt(initialDeposit.getText());
+                cashMachine.login(1000);
                 accountNumberTracker+=1000;
-                cashMachine.addAccount(accountNumberTracker, name.getText(), email.getText(), Integer.parseInt(initialDeposit.getText()));
+                cashMachine.addAccount(accountNumberTracker, n, mail, am);
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setContentText("New Account Created! Tha account number is" + accountNumberTracker);
-            });
+                alert.setContentText("New Account Created! The account number is " + accountNumberTracker);
+                alert.show();
+            }
         });
 
         login.setOnAction(e -> {
-            //cashMachine
             createAccount.setDisable(true);
             login.setDisable(true);
             logout.setDisable(false);

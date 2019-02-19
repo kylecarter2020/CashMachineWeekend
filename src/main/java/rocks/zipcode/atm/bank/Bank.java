@@ -24,7 +24,9 @@ public class Bank {
     }
 
     public ActionResult<AccountData> addAccount(int accountNumber, String name, String email, int initialDeposit){
-        Account account = accounts.put(2000, new PremiumAccount(new AccountData(accountNumber, name, email, initialDeposit)));
+        accounts.put(accountNumber, new PremiumAccount(new AccountData(
+                accountNumber, name, email, initialDeposit)));
+        Account account = accounts.get(accountNumber);
         return ActionResult.success(account.getAccountData());
     }
 
