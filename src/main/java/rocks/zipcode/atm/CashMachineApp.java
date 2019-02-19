@@ -1,5 +1,7 @@
 package rocks.zipcode.atm;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -57,9 +59,9 @@ public class CashMachineApp extends Application {
         login.setPrefSize(buttonWidth, buttonHeight);
 
         Button logout = new Button("Logout");
-        login.setPrefSize(buttonWidth, buttonHeight);
+        logout.setPrefSize(buttonWidth, buttonHeight);
 
-        HBox hBox = new HBox(200);
+        HBox hBox = new HBox(100);
         hBox.setAlignment(Pos.CENTER);
 
         Button deposit = new Button("Deposit");
@@ -140,8 +142,8 @@ public class CashMachineApp extends Application {
 
             Optional<Void> result = dialog.showAndWait();
 
-            result.ifPresent(accountInfo -> {
-                incrementAccountNumber();
+            result. (accountInfo -> {
+                accountNumberTracker+=1000;
                 cashMachine.addAccount(accountNumberTracker, name.getText(), email.getText(), Integer.parseInt(initialDeposit.getText()));
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setContentText("New Account Created! Tha account number is" + accountNumberTracker);
@@ -155,48 +157,77 @@ public class CashMachineApp extends Application {
             logout.setDisable(false);
             accountsComboBox.setDisable(false);
 
-            ArrayList<Integer> menuOptions = new ArrayList<>();
+            ObservableList<Integer> menuOptions = FXCollections.observableArrayList();
 
             for (int i = 1000; i <= accountNumberTracker; i+=1000) {
                 menuOptions.add(i);
             }
 
-            accountsComboBox.setValue(menuOptions);
+            accountsComboBox.setItems(menuOptions);
 
-            cashMachine.login(Integer.parseInt(accountsComboBox.getValue().toString()));
+            accountsComboBox.setOnAction(event -> {
+                int id = Integer.parseInt(accountsComboBox.getValue().toString());
+                cashMachine.login(id);
+                float bal = cashMachine.getBalance();
+                nameField.setText(cashMachine.getName());
+                emailField.setText(cashMachine.getEmail());
+                accountBalance.setText(String.format("$%.2f", bal));
+
+                deposit.setDisable(false);
+                withdraw.setDisable(false);
+            });
+
+
+        });
+
+        deposit.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Deposit");
+            dialog.setHeaderText("Enter Deposit Amount:");
+            dialog.setContentText("Deposit:");
+
+            Optional<String> result = dialog.showAndWait();
+
+            result.ifPresent(amount -> {
+                cashMachine.deposit(Integer.parseInt(amount));
+                float bal = cashMachine.getBalance();
+                accountBalance.setText(String.format("$%.2f", bal));
+            });
+        });
+
+        withdraw.setOnAction(e -> {
+            TextInputDialog dialog = new TextInputDialog();
+            dialog.setTitle("Withdraw");
+            dialog.setHeaderText("Enter Withdrawal Amount:");
+            dialog.setContentText("Withdraw:");
+
+            Optional<String> result = dialog.showAndWait();
+
+            result.ifPresent(amount -> {
+                cashMachine.withdraw(Integer.parseInt(amount));
+                float bal = cashMachine.getBalance();
+                accountBalance.setText(String.format("$%.2f", bal));
+            });
+        });
+
+        logout.setOnAction(event -> {
+            login.setDisable(false);
+            createAccount.setDisable(false);
+            accountsComboBox.setDisable(true);
+            logout.setDisable(true);
+            withdraw.setDisable(true);
+            deposit.setDisable(true);
+            accountsComboBox.getSelectionModel().clearSelection();
             nameField.setText("");
-
+            emailField.setText("");
+            accountBalance.setText("");
         });
-        Button btnSubmit = new Button("Set Account ID");
-        btnSubmit.setOnAction(e -> {
-            //int id = Integer.parseInt(field.getText());
-            //cashMachine.login(id);
-
-            //areaInfo.setText(cashMachine.toString());
-        });
-
-        Button btnDeposit = new Button("Deposit");
-        btnDeposit.setOnAction(e -> {
-            //int amount = Integer.parseInt(field.getText());
-            //cashMachine.deposit(amount);
-
-            //areaInfo.setText(cashMachine.toString());
-        });
-
-        Button btnWithdraw = new Button("Withdraw");
-        btnWithdraw.setOnAction(e -> {
-            //int amount = Integer.parseInt(field.getText());
-            //cashMachine.withdraw(amount);
-
-            //areaInfo.setText(cashMachine.toString());
-        });
-
-        Button btnExit = new Button("Exit");
-        btnExit.setOnAction(e -> {
-            cashMachine.exit();
-
-           // areaInfo.setText(cashMachine.toString());
-        });
+//        Button btnExit = new Button("Exit");
+//        btnExit.setOnAction(e -> {
+//            cashMachine.exit();
+//
+//            areaInfo.setText(cashMachine.toString());
+//        });
 
         FlowPane flowpane = new FlowPane();
         flowpane.setAlignment(Pos.TOP_CENTER);
@@ -217,10 +248,6 @@ public class CashMachineApp extends Application {
     public void start(Stage stage) throws Exception {
         stage.setScene(new Scene(createContent()));
         stage.show();
-    }
-
-    public void incrementAccountNumber() {
-        accountNumberTracker += 1000;
     }
 
     public static void main(String[] args) {

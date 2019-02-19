@@ -62,6 +62,18 @@ public class CashMachine {
         }
     }
 
+    public String getName() {
+        return accountData != null ? accountData.getName() : "N/A";
+    }
+
+    public String getEmail() {
+        return accountData != null ? accountData.getEmail() : "N/A";
+    }
+
+    public int getBalance() {
+        return accountData != null ? accountData.getBalance() : 0;
+    }
+
     @Override
     public String toString() {
         return accountData != null ? accountData.toString() : "Try account 1000 or 2000 and click submit.";
