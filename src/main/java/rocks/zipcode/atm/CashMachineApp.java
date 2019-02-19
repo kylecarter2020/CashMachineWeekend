@@ -1,26 +1,23 @@
 package rocks.zipcode.atm;
 
+import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.stage.Modality;
-import rocks.zipcode.atm.bank.AccountData;
-import rocks.zipcode.atm.bank.Bank;
-import javafx.application.Application;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
+import rocks.zipcode.atm.bank.Bank;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 /**
@@ -201,6 +198,7 @@ public class CashMachineApp extends Application {
         });
 
         withdraw.setOnAction(e -> {
+            int initial = cashMachine.getBalance();
             TextInputDialog dialog = new TextInputDialog();
             dialog.setTitle("Withdraw");
             dialog.setHeaderText("Enter Withdrawal Amount:");
@@ -212,6 +210,18 @@ public class CashMachineApp extends Application {
                 cashMachine.withdraw(Integer.parseInt(amount));
                 float bal = cashMachine.getBalance();
                 accountBalance.setText(String.format("$%.2f", bal));
+                if(bal == initial)
+                {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText(String.format("Withdrawal failed! Not enough funds!\n\nYour balance is $%.2f", bal));
+                    alert.show();
+                }
+                else if(cashMachine.getBalance() < 0)
+                {
+                    Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                    alert.setContentText("The account is in overdraft!\n\nPlease add money to the account!");
+                    alert.show();
+                }
             });
         });
 
@@ -226,13 +236,21 @@ public class CashMachineApp extends Application {
             nameField.setText("");
             emailField.setText("");
             accountBalance.setText("");
+
         });
-//        Button btnExit = new Button("Exit");
-//        btnExit.setOnAction(e -> {
-//            cashMachine.exit();
-//
-//            areaInfo.setText(cashMachine.toString());
-//        });
+
+        help.setOnAction(e -> {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Help Menu");
+            alert.setHeaderText("Help Menu");
+            alert.setContentText("Create Account - Create a new account by entering name, email address and initial deposit amount.\n\n" +
+                    "Login - Login to view the existing accounts in the system as well as make withdrawals and deposits.\n\n" +
+                    "Deposit - Deposit specified amount to account.\n\n" +
+                    "Withdraw - Withdraw specified amount from account.\n\n" +
+                    "Logout - Logout of accounts view. You must be logged out to create new accounts.\n\n" +
+                    "Exit - Quit the program.\n");
+            alert.show();
+        });
 
         FlowPane flowpane = new FlowPane();
         flowpane.setAlignment(Pos.TOP_CENTER);
